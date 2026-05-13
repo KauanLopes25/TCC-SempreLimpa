@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS endereco (
     complemento VARCHAR(100)
 );
 
+alter table endereco
+rename column endereco_PK to endereco_id;
+
 CREATE TABLE IF NOT EXISTS endereco_lavanderia (
     endereco_lavanderia_PK INT PRIMARY KEY AUTO_INCREMENT,
     cep VARCHAR(8) NOT NULL,
@@ -24,6 +27,9 @@ CREATE TABLE IF NOT EXISTS endereco_lavanderia (
     numero VARCHAR(4) NOT NULL,
     complemento VARCHAR(100)
 );
+
+alter table endereco_lavanderia
+rename column endereco_lavanderia_PK to endereco_lavanderia_id;
 
 CREATE TABLE IF NOT EXISTS status (
     status_id INT PRIMARY KEY AUTO_INCREMENT,
