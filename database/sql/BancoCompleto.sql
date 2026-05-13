@@ -4,7 +4,7 @@ USE sempre_limpa_db;
 
 -- 2. TABELAS INDEPENDENTES (NÍVEL 1)
 CREATE TABLE IF NOT EXISTS endereco (
-    endereco_PK INT PRIMARY KEY AUTO_INCREMENT,
+    endereco_id INT PRIMARY KEY AUTO_INCREMENT,
     cep VARCHAR(11) NOT NULL,
     uf VARCHAR(2) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
@@ -14,11 +14,8 @@ CREATE TABLE IF NOT EXISTS endereco (
     complemento VARCHAR(100)
 );
 
-alter table endereco
-rename column endereco_PK to endereco_id;
-
 CREATE TABLE IF NOT EXISTS endereco_lavanderia (
-    endereco_lavanderia_PK INT PRIMARY KEY AUTO_INCREMENT,
+    endereco_lavanderia_id INT PRIMARY KEY AUTO_INCREMENT,
     cep VARCHAR(8) NOT NULL,
     uf VARCHAR(2) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
@@ -27,9 +24,6 @@ CREATE TABLE IF NOT EXISTS endereco_lavanderia (
     numero VARCHAR(4) NOT NULL,
     complemento VARCHAR(100)
 );
-
-alter table endereco_lavanderia
-rename column endereco_lavanderia_PK to endereco_lavanderia_id;
 
 CREATE TABLE IF NOT EXISTS status (
     status_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -180,6 +174,24 @@ CREATE TABLE IF NOT EXISTS pix (
     status ENUM('PAGO','PENDENTE','EXPIRADO') DEFAULT 'PENDENTE',
     fk_ordem_pagamento_id INT,
     CONSTRAINT fk_pix_ordem_pagamento FOREIGN KEY (fk_ordem_pagamento_id) REFERENCES ordem_pagamento(ordem_pagamento_id)
+);
+
+CREATE TABLE cartao_usuario (
+    fk_usuario_id INT NOT NULL,
+    fk_cartao_id INT NOT NULL,
+    
+    -- Definindo a Chave Primária Composta (as duas chaves juntas identificam a linha)
+    PRIMARY KEY (fk_usuario_id, fk_cartao_id),
+    
+    -- Definindo as Chaves Estrangeiras
+    CONSTRAINT fk_possui_usuario 
+        FOREIGN KEY (fk_usuario_id) 
+        REFERENCES usuario (usuario_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_possui_cartao 
+        FOREIGN KEY (fk_cartao_id) 
+        REFERENCES cartao (cartao_id)
+        ON DELETE CASCADE
 );
 
 -- 1. Endereços (Base para tudo)
