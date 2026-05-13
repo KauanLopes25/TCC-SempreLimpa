@@ -36,6 +36,10 @@ CREATE TABLE IF NOT EXISTS roupas (
     nome_peca VARCHAR(100) NOT NULL
 );
 
+-- Excluir o campo quantidade
+alter table roupas
+drop column quantidade;
+
 -- 3. TABELAS DEPENDENTES (NÍVEL 2 - Entidades com FK para o Nível 1)
 CREATE TABLE IF NOT EXISTS usuario (
     usuario_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -48,6 +52,7 @@ CREATE TABLE IF NOT EXISTS usuario (
     senha VARCHAR(12) NOT NULL,
     CONSTRAINT fk_usuario_endereco FOREIGN KEY (fk_endereco) REFERENCES endereco(endereco_PK)
 );
+
 
 CREATE TABLE IF NOT EXISTS lavanderia (
     lavanderia_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -62,6 +67,14 @@ CREATE TABLE IF NOT EXISTS lavanderia (
     fk_endereco_lavanderia INT,
     CONSTRAINT fk_lavanderia_endereco_lavanderia FOREIGN KEY (fk_endereco_lavanderia) REFERENCES endereco_lavanderia(endereco_lavanderia_PK)
 );
+
+-- Adicionar campos de preço na tabela lavanderia
+alter table lavanderia
+modify preco_padrao_lavagem decimal(10,2) not null after tempo_secagem;
+alter table lavanderia
+add preco_padrao_secagem decimal(10,2) not null after preco_padrao_lavagem;
+
+desc lavanderia;
 
 -- 4. TABELAS DE FLUXO (NÍVEL 3 - Dependem de Usuário/Lavanderia/Status)
 CREATE TABLE IF NOT EXISTS cartao (
@@ -126,6 +139,12 @@ CREATE TABLE IF NOT EXISTS recebe (
     CONSTRAINT fk_recebe_roupas FOREIGN KEY (fk_roupas_id) REFERENCES roupas(id)
 );
 
+-- alterar nome da tabela recebe e adicionar campo quantidade
+rename table recebe to cesto_roupa;
+
+alter table cesto_roupa
+add quantidade INT(30);
+
 CREATE TABLE IF NOT EXISTS ordem_pagamento (
     ordem_pagamento_id INT PRIMARY KEY AUTO_INCREMENT,
     tipo_pagamento ENUM('PIX','CARTAO') NOT NULL,
@@ -173,13 +192,28 @@ INSERT IGNORE INTO usuario VALUES (2,'Maria Silva','maria@email.com','1198765432
 INSERT IGNORE INTO usuario VALUES (3,'João Santos','joao@email.com','11991234567','98765432100',NULL,1,'joao123');
 INSERT IGNORE INTO usuario VALUES (4,'Ana Souza','ana@email.com','11999887766','45678912300',NULL,1,'ana123');
 
-REPLACE INTO lavanderia (lavanderia_id, nome, descricao, cnpj, tempo_padrao_lavagem, tempo_secagem, logo, e_mail, telefone, fk_endereco_lavanderia) VALUES 
-(2, '5asec', NULL, '04078995000245', NULL, NULL, 'https://...s', '5asec@test.com', '11999999998', 1),
-(3, 'white Bubble', NULL, '12345678000199', NULL, NULL, 'https://via.placeholder.com/150', 'bubble@test.com', '11988888888', 2),
-(4, 'Super Clean', NULL, '98765432000188', NULL, NULL, 'https://via.placeholder.com/150', 'superclean@test.com', '11977777777', 3),
-(5, 'Lavanderia Rápida', NULL, '11222333000155', NULL, NULL, 'https://via.placeholder.com/150', 'rapida@test.com', '11966666666', 4),
-(6, 'Premium Clean', 'Especializada em lavagem delicada e roupas finas', '99887766000144', '01:20:00', '00:50:00', 'https://via.placeholder.com/150', 'premiumclean@test.com', '11993334444', 5);
+select * from usuario;
 
+INSERT INTO lavanderia (
+    lavanderia_id, nome, descricao, cnpj, 
+    tempo_padrao_lavagem, tempo_secagem, 
+    preco_padrao_lavagem, preco_padrao_secagem, 
+    logo, e_mail, telefone, fk_endereco_lavanderia
+) VALUES 
+(2, '5asec', NULL, '04078995000245', NULL, NULL, 30.00, 15.00, 'https://...s', '5asec@test.com', '11999999998', 1),
+(3, 'white Bubble', NULL, '12345678000199', NULL, NULL, 25.50, 12.00, 'https://via.placeholder.com/150', 'bubble@test.com', '11988888888', 2),
+(4, 'Super Clean', NULL, '98765432000188', NULL, NULL, 40.00, 20.00, 'https://via.placeholder.com/150', 'superclean@test.com', '11977777777', 3),
+(5, 'Lavanderia Rápida', NULL, '11222333000155', NULL, NULL, 20.00, 10.00, 'https://via.placeholder.com/150', 'rapida@test.com', '11966666666', 4),
+(6, 'Premium Clean', 'Especializada em lavagem delicada', '99887766000144', '01:20:00', '00:50:00', 55.00, 25.00, 'https://via.placeholder.com/150', 'premiumclean@test.com', '11993334444', 5)
+ON DUPLICATE KEY UPDATE 
+    preco_padrao_lavagem = VALUES(preco_padrao_lavagem),
+    preco_padrao_secagem = VALUES(preco_padrao_secagem),
+    descricao = VALUES(descricao),
+    tempo_padrao_lavagem = VALUES(tempo_padrao_lavagem),
+    tempo_secagem = VALUES(tempo_secagem);
+    
+    select * from lavanderia;
+    
 -- 3. Status e Feedbacks
 INSERT IGNORE INTO status (status_id, descricao) VALUES (1, 'PENDENTE'), (2, 'PAGO'), (3, 'EM_ANDAMENTO'), (4, 'FINALIZADO'), (5, 'CANCELADO');
 
@@ -460,3 +494,8 @@ CALL sp_criar_pedido_completo(
     NULL,           -- tipo cartao
     @pedido_id
 );
+
+select * from cartao;
+
+delete from cartao
+where cartao_id = 2;
