@@ -1,0 +1,16 @@
+
+CREATE OR REPLACE VIEW vw_lavanderia_endereco AS
+SELECT 
+    l.*, 
+    e.cep,
+    e.uf,
+    e.cidade,
+    e.bairro,
+    e.logradouro,
+    e.numero,
+    e.complemento
+FROM 
+    lavanderia AS l
+INNER JOIN 
+    endereco_lavanderia AS e 
+    ON l.endereco_lavanderia_id = e.endereco_lavanderia_PK;
