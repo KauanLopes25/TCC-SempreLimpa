@@ -10,8 +10,6 @@ FROM avaliacao a
 JOIN usuario u ON u.usuario_id = a.fk_usuario_id
 JOIN lavanderia l ON l.lavanderia_id = a.fk_lavanderia_id;
 
-SELECT * FROM vw_avaliacoes;
-
 /* View de média de avaliações das lavanderias */
 CREATE VIEW vw_media_lavanderia AS
 SELECT 
@@ -22,8 +20,6 @@ FROM lavanderia l
 LEFT JOIN avaliacao a 
     ON a.fk_lavanderia_id = l.lavanderia_id
 GROUP BY l.lavanderia_id, l.nome;
-
-SELECT * FROM vw_media_lavanderia ORDER BY media_avaliacao DESC;
 
 /* View para mostrar endereço do usuário no perfil */
 CREATE VIEW vw_usuario_endereco_perfil AS
@@ -41,7 +37,7 @@ SELECT
         ) AS endereco_completo
 FROM usuario u
 JOIN endereco e 
-    ON e.endereco_PK = u.fk_endereco;
+    ON e.endereco_id = u.fk_endereco;
     
 /* View para mostrar pedidos completo(histórico) */
 CREATE VIEW vw_pedido_completo AS
@@ -58,8 +54,6 @@ FROM pedido p
 JOIN usuario u ON u.usuario_id = p.fk_usuario_id
 JOIN lavanderia l ON l.lavanderia_id = p.fk_lavanderia_id
 JOIN status s ON s.status_id = p.fk_status_id;
-
-SELECT * FROM vw_pedido_completo;
 
 /* View para mostrar pagamento detalhado(histórico) */
 CREATE VIEW vw_pagamento_detalhado AS
@@ -86,11 +80,10 @@ CREATE VIEW vw_cesto_roupas AS
 SELECT 
     c.cesto_id,
     r.nome_peca,
-    re.fk_roupas_id,
-    r.quantidade
+    re.fk_roupa_id
 FROM cesto c
-JOIN recebe re ON re.fk_cesto_id = c.cesto_id
-JOIN roupas r ON r.id = re.fk_roupas_id;
+JOIN cesto_roupa re ON re.fk_cesto_id = c.cesto_id
+JOIN roupa r ON r.roupa_id = re.fk_roupa_id;
 
 /* View para mostrar lavanderias favoritadas(filtro) */
 CREATE VIEW vw_favoritos_usuario AS

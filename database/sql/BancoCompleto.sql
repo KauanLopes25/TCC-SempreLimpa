@@ -30,15 +30,10 @@ CREATE TABLE IF NOT EXISTS status (
     descricao VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS roupas (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    quantidade INT NOT NULL,
+CREATE TABLE IF NOT EXISTS roupa (
+    roupa_id INT PRIMARY KEY AUTO_INCREMENT,
     nome_peca VARCHAR(100) NOT NULL
 );
-
--- Excluir o campo quantidade
-alter table roupas
-drop column quantidade;
 
 -- 3. TABELAS DEPENDENTES (NÍVEL 2 - Entidades com FK para o Nível 1)
 CREATE TABLE IF NOT EXISTS usuario (
@@ -50,9 +45,8 @@ CREATE TABLE IF NOT EXISTS usuario (
     rne VARCHAR(9),
     fk_endereco INT,
     senha VARCHAR(12) NOT NULL,
-    CONSTRAINT fk_usuario_endereco FOREIGN KEY (fk_endereco) REFERENCES endereco(endereco_PK)
+    CONSTRAINT fk_usuario_endereco FOREIGN KEY (fk_endereco) REFERENCES endereco(endereco_id)
 );
-
 
 CREATE TABLE IF NOT EXISTS lavanderia (
     lavanderia_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -61,20 +55,14 @@ CREATE TABLE IF NOT EXISTS lavanderia (
     cnpj VARCHAR(14) UNIQUE NOT NULL,
     tempo_padrao_lavagem TIME,
     tempo_secagem TIME,
+    preco_padrao_lavagem decimal(10,2),
+    preco_padrao_secagem decimal(10,2),
     logo VARCHAR(255),
     e_mail VARCHAR(255),
     telefone VARCHAR(11),
     fk_endereco_lavanderia INT,
-    CONSTRAINT fk_lavanderia_endereco_lavanderia FOREIGN KEY (fk_endereco_lavanderia) REFERENCES endereco_lavanderia(endereco_lavanderia_PK)
+    CONSTRAINT fk_lavanderia_endereco_lavanderia FOREIGN KEY (fk_endereco_lavanderia) REFERENCES endereco_lavanderia(endereco_lavanderia_id)
 );
-
--- Adicionar campos de preço na tabela lavanderia
-alter table lavanderia
-modify preco_padrao_lavagem decimal(10,2) not null after tempo_secagem;
-alter table lavanderia
-add preco_padrao_secagem decimal(10,2) not null after preco_padrao_lavagem;
-
-desc lavanderia;
 
 -- 4. TABELAS DE FLUXO (NÍVEL 3 - Dependem de Usuário/Lavanderia/Status)
 CREATE TABLE IF NOT EXISTS cartao (
@@ -92,7 +80,7 @@ CREATE TABLE IF NOT EXISTS favoritos (
     fk_usuario_id INT NOT NULL,
     fk_lavanderia_id INT NOT NULL,
     CONSTRAINT fk_favoritos_usuario FOREIGN KEY (fk_usuario_id) REFERENCES usuario(usuario_id),
-    CONSTRAINT fk_favoritos_lavanderia FOREIGN KEY (fk_lavanderia_id) REFERENCES lavanderia(lavanderia_id)
+    CONSTRAINT fk_favoritos_lavanderia FOREIGN KEY (fk_lavanderia_id) REFERENCES lavanderia(lavanderia_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS avaliacao (
@@ -103,7 +91,7 @@ CREATE TABLE IF NOT EXISTS avaliacao (
     fk_usuario_id INT,
     fk_lavanderia_id INT,
     CONSTRAINT fk_avaliacao_usuario FOREIGN KEY (fk_usuario_id) REFERENCES usuario(usuario_id),
-    CONSTRAINT fk_avaliacao_lavanderia FOREIGN KEY (fk_lavanderia_id) REFERENCES lavanderia(lavanderia_id)
+    CONSTRAINT fk_avaliacao_lavanderia FOREIGN KEY (fk_lavanderia_id) REFERENCES lavanderia(lavanderia_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS pedido (
@@ -117,7 +105,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     fk_lavanderia_id INT,
     fk_usuario_id INT,
     CONSTRAINT fk_pedido_status FOREIGN KEY (fk_status_id) REFERENCES status(status_id),
-    CONSTRAINT fk_pedido_lavanderia FOREIGN KEY (fk_lavanderia_id) REFERENCES lavanderia(lavanderia_id),
+    CONSTRAINT fk_pedido_lavanderia FOREIGN KEY (fk_lavanderia_id) REFERENCES lavanderia(lavanderia_id) ON DELETE CASCADE,
     CONSTRAINT fk_pedido_usuario FOREIGN KEY (fk_usuario_id) REFERENCES usuario(usuario_id)
 );
 
@@ -131,19 +119,14 @@ CREATE TABLE IF NOT EXISTS cesto (
     CONSTRAINT fk_cesto_pedido FOREIGN KEY (fk_pedido_id) REFERENCES pedido(pedido_id)
 );
 
-CREATE TABLE IF NOT EXISTS recebe (
+CREATE TABLE IF NOT EXISTS cesto_roupa (
     fk_cesto_id INT,
-    fk_roupas_id INT,
-    PRIMARY KEY (fk_cesto_id, fk_roupas_id),
+    fk_roupa_id INT,
+    quantidade INT(30),
+    PRIMARY KEY (fk_cesto_id, fk_roupa_id),
     CONSTRAINT fk_recebe_cesto FOREIGN KEY (fk_cesto_id) REFERENCES cesto(cesto_id),
-    CONSTRAINT fk_recebe_roupas FOREIGN KEY (fk_roupas_id) REFERENCES roupas(id)
+    CONSTRAINT fk_recebe_roupa FOREIGN KEY (fk_roupa_id) REFERENCES roupa(roupa_id)
 );
-
--- alterar nome da tabela recebe e adicionar campo quantidade
-rename table recebe to cesto_roupa;
-
-alter table cesto_roupa
-add quantidade INT(30);
 
 CREATE TABLE IF NOT EXISTS ordem_pagamento (
     ordem_pagamento_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -197,7 +180,7 @@ CREATE TABLE cartao_usuario (
 -- 1. Endereços (Base para tudo)
 INSERT IGNORE INTO endereco VALUES (1,'06657300','SP','Itapevi','Rosemary','Rua serra do paracaima','1374',NULL);
 
-INSERT IGNORE INTO endereco_lavanderia (endereco_lavanderia_PK, cep, uf, cidade, bairro, logradouro, numero, complemento) VALUES 
+INSERT IGNORE INTO endereco_lavanderia (endereco_lavanderia_id, cep, uf, cidade, bairro, logradouro, numero, complemento) VALUES 
 (1, '01001000', 'SP', 'São Paulo', 'Centro', 'Praça da Sé', '100', 'Sala 1'),
 (2, '04538132', 'SP', 'São Paulo', 'Itaim Bibi', 'Av. Brigadeiro Faria Lima', '3477', 'Térreo'),
 (3, '01310100', 'SP', 'São Paulo', 'Bela Vista', 'Av. Paulista', '1500', 'Loja A'),
@@ -287,7 +270,7 @@ SELECT
         ) AS endereco_completo
 FROM usuario u
 JOIN endereco e 
-    ON e.endereco_PK = u.fk_endereco;
+    ON e.endereco_id = u.fk_endereco;
     
 /* View para mostrar pedidos completo(histórico) */
 CREATE VIEW vw_pedido_completo AS
@@ -330,11 +313,10 @@ CREATE VIEW vw_cesto_roupas AS
 SELECT 
     c.cesto_id,
     r.nome_peca,
-    re.fk_roupas_id,
-    r.quantidade
+    re.fk_roupa_id
 FROM cesto c
-JOIN recebe re ON re.fk_cesto_id = c.cesto_id
-JOIN roupas r ON r.id = re.fk_roupas_id;
+JOIN cesto_roupa re ON re.fk_cesto_id = c.cesto_id
+JOIN roupa r ON r.roupa_id = re.fk_roupa_id;
 
 /* View para mostrar lavanderias favoritadas(filtro) */
 CREATE VIEW vw_favoritos_usuario AS
@@ -512,8 +494,3 @@ CALL sp_criar_pedido_completo(
     NULL,           -- tipo cartao
     @pedido_id
 );
-
-select * from cartao;
-
-delete from cartao
-where cartao_id = 2;
