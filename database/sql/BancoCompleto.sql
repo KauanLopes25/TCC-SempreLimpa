@@ -36,6 +36,9 @@ CREATE TABLE IF NOT EXISTS roupas (
     nome_peca VARCHAR(100) NOT NULL
 );
 
+select * from cartao;
+select * from usuario;
+
 -- Excluir o campo quantidade
 alter table roupas
 drop column quantidade;
@@ -396,6 +399,7 @@ BEGIN
     -- 1. CÁLCULO DE VALORES
     -- Definindo taxa fixa do entregador
     SET @taxa_entregador = 20.00;
+    SET @taxa_app = 06.00;
     -- Valor final = serviço + entrega + entregador
     SET v_valor_final = p_valor + p_taxa_entrega + @taxa_entregador;
 
@@ -405,6 +409,7 @@ BEGIN
         valor_total,
         taxa_entrega,
         taxa_entregador,
+        taxa_app,
         tempo_estimado,
         fk_status_id,
         fk_lavanderia_id,
@@ -415,6 +420,7 @@ BEGIN
         p_valor,
         p_taxa_entrega,
         @taxa_entregador,
+        @taxa_app,
         '01:00:00',
         1, -- Status PENDENTE
         p_lavanderia,
@@ -513,7 +519,3 @@ CALL sp_criar_pedido_completo(
     @pedido_id
 );
 
-select * from cartao;
-
-delete from cartao
-where cartao_id = 2;
