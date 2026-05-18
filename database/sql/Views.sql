@@ -1,47 +1,50 @@
-/* View de avaliações das lavanderias */
+-- =========================================================
+-- VIEWS
+-- =========================================================
+
 CREATE VIEW vw_avaliacoes AS
-SELECT 
+SELECT
     l.nome AS lavanderia,
     u.nome AS usuario,
     a.nota,
     a.comentario,
     a.data
 FROM avaliacao a
-JOIN usuario u ON u.usuario_id = a.fk_usuario_id
-JOIN lavanderia l ON l.lavanderia_id = a.fk_lavanderia_id;
+INNER JOIN usuario u
+    ON u.usuario_id = a.fk_usuario_id
+INNER JOIN lavanderia l
+    ON l.lavanderia_id = a.fk_lavanderia_id;
 
-/* View de média de avaliações das lavanderias */
 CREATE VIEW vw_media_lavanderia AS
-SELECT 
+SELECT
     l.lavanderia_id,
     l.nome,
     ROUND(AVG(a.nota),1) AS media_avaliacao
 FROM lavanderia l
-LEFT JOIN avaliacao a 
+LEFT JOIN avaliacao a
     ON a.fk_lavanderia_id = l.lavanderia_id
 GROUP BY l.lavanderia_id, l.nome;
 
-/* View para mostrar endereço do usuário no perfil */
 CREATE VIEW vw_usuario_endereco_perfil AS
-SELECT 
+SELECT
     u.usuario_id,
     u.nome,
+
     CONCAT(
-		COALESCE(e.logradouro, ''),', ',
-		COALESCE(e.numero, ''),' - ',
-        COALESCE(e.bairro, ''),', ',
-        COALESCE(e.cidade, ''),' - ',
-        COALESCE(e.uf, ''), ' - CEP: ',
-        COALESCE(e.cep, ''),
-		COALESCE(e.complemento, '')
-        ) AS endereco_completo
+        e.logradouro, ', ',
+        e.numero, ' - ',
+        e.bairro, ', ',
+        e.cidade, ' - ',
+        e.uf, ' CEP: ',
+        e.cep
+    ) AS endereco_completo
+
 FROM usuario u
-JOIN endereco e 
+INNER JOIN endereco e
     ON e.endereco_id = u.fk_endereco;
-    
-/* View para mostrar pedidos completo(histórico) */
+
 CREATE VIEW vw_pedido_completo AS
-SELECT 
+SELECT
     p.pedido_id,
     u.nome AS usuario,
     l.nome AS lavanderia,
@@ -51,45 +54,106 @@ SELECT
     s.descricao AS status,
     p.data
 FROM pedido p
-JOIN usuario u ON u.usuario_id = p.fk_usuario_id
-JOIN lavanderia l ON l.lavanderia_id = p.fk_lavanderia_id
-JOIN status s ON s.status_id = p.fk_status_id;
+INNER JOIN usuario u
+    ON u.usuario_id = p.fk_usuario_id
+INNER JOIN lavanderia l
+    ON l.lavanderia_id = p.fk_lavanderia_id
+INNER JOIN status s
+    ON s.status_id = p.fk_status_id;
 
-/* View para mostrar pagamento detalhado(histórico) */
 CREATE VIEW vw_pagamento_detalhado AS
-SELECT 
+SELECT
     op.ordem_pagamento_id,
     op.tipo_pagamento,
     op.valor,
     op.status,
+
     p.pedido_id,
-    
+
     pc.tipo AS tipo_cartao,
+
     px.status AS status_pix
-    
+
 FROM ordem_pagamento op
-LEFT JOIN pagamento_cartao pc 
+
+LEFT JOIN pagamento_cartao pc
     ON pc.fk_ordem_pagamento_id = op.ordem_pagamento_id
-LEFT JOIN pix px 
+
+LEFT JOIN pix px
     ON px.fk_ordem_pagamento_id = op.ordem_pagamento_id
-JOIN pedido p 
+
+INNER JOIN pedido p
     ON p.pedido_id = op.fk_pedido_id;
-    
-/* View para mostrar o cesto e roupas */
+
 CREATE VIEW vw_cesto_roupas AS
-SELECT 
+SELECT
     c.cesto_id,
     r.nome_peca,
-    re.fk_roupa_id
+    cr.quantidade
 FROM cesto c
-JOIN cesto_roupa re ON re.fk_cesto_id = c.cesto_id
-JOIN roupa r ON r.roupa_id = re.fk_roupa_id;
+INNER JOIN cesto_roupa cr
+    ON cr.fk_cesto_id = c.cesto_id
+INNER JOIN roupas r
+    ON r.id = cr.fk_roupas_id;
 
-/* View para mostrar lavanderias favoritadas(filtro) */
 CREATE VIEW vw_favoritos_usuario AS
-SELECT 
+SELECT
     u.nome AS usuario,
     l.nome AS lavanderia
 FROM favoritos f
-JOIN usuario u ON u.usuario_id = f.fk_usuario_id
-JOIN lavanderia l ON l.lavanderia_id = f.fk_lavanderia_id;
+INNER JOIN usuario u
+    ON u.usuario_id = f.fk_usuario_id
+INNER JOIN lavanderia l
+    ON l.lavanderia_id = f.fk_lavanderia_id;
+
+CREATE VIEW vw_lavanderias_completas AS
+SELECT
+    l.lavanderia_id,
+    l.nome,
+    l.descricao,
+    l.preco_padrao_lavagem,
+    l.preco_padrao_secagem,
+    l.logo,
+    l.telefone,
+
+    e.cidade,
+    e.uf,
+    e.bairro,
+    e.logradouro,
+    e.numero
+
+FROM lavanderia l
+
+INNER JOIN endereco_lavanderia e
+    ON l.fk_endereco_lavanderia =
+       e.endereco_lavanderia_id;
+
+CREATE VIEW vw_lavanderias_preco AS
+SELECT
+    lavanderia_id,
+    nome,
+    preco_padrao_lavagem,
+    preco_padrao_secagem,
+
+    (
+        preco_padrao_lavagem +
+        preco_padrao_secagem
+    ) / 2 AS preco_medio
+
+FROM lavanderia;
+
+CREATE VIEW vw_lavanderias_populares AS
+SELECT
+    l.lavanderia_id,
+    l.nome,
+
+    COUNT(p.pedido_id) AS total_pedidos
+
+FROM lavanderia l
+
+LEFT JOIN pedido p
+    ON p.fk_lavanderia_id = l.lavanderia_id
+
+GROUP BY l.lavanderia_id, l.nome
+
+ORDER BY total_pedidos DESC;
