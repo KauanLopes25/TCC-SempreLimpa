@@ -54,6 +54,7 @@ CREATE TABLE usuario (
     rne VARCHAR(9),
     fk_endereco INT,
     senha VARCHAR(12) NOT NULL,
+    data_nascimento DATE NOT null,
 
     CONSTRAINT fk_usuario_endereco
         FOREIGN KEY (fk_endereco)
@@ -422,6 +423,17 @@ CREATE TABLE cartao_virtual (
         REFERENCES motorista(motorista_id)
 );
 
+CREATE TABLE endereco_motorista (
+    endereco_motorista_id INT PRIMARY KEY AUTO_INCREMENT,
+    cep VARCHAR(8) NOT NULL,
+    uf VARCHAR(2) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    bairro VARCHAR(100) NOT NULL,
+    logradouro VARCHAR(100) NOT NULL,
+    numero VARCHAR(4) NOT NULL,
+    complemento VARCHAR(100)
+);
+
 -- =========================================================
 -- INSERTS
 -- =========================================================
@@ -468,6 +480,22 @@ VALUES
 ('04538132','SP','São Paulo','Itaim Bibi','Av Brigadeiro Faria Lima','3477','Térreo'),
 ('01310100','SP','São Paulo','Bela Vista','Av Paulista','1500','Loja A');
 
+-- ENDEREÇOS MOTORISTA
+
+INSERT INTO endereco_motorista (
+cep, 
+uf, 
+cidade, 
+bairro, 
+logradouro, 
+numero, 
+complemento
+)
+VALUES 
+('01310200', 'SP', 'São Paulo', 'Bela Vista', 'Avenida Paulista', '1578', '9º andar'),
+('20040002', 'RJ', 'Rio de Janeiro', 'Centro', 'Avenida Rio Branco', '125', NULL),
+('30140010', 'MG', 'Belo Horizonte', 'Savassi', 'Rua Pernambuco', '45', 'Bloco B - Ap 402');
+
 -- USUÁRIOS
 
 INSERT INTO usuario (
@@ -477,12 +505,13 @@ INSERT INTO usuario (
     cpf,
     rne,
     fk_endereco,
-    senha
+    senha,
+    data_nascimento
 )
 VALUES
-('Weslei','weslei@email.com','11984106174','57030864859',NULL,1,'weslei123'),
-('Maria Silva','maria@email.com','11987654321','12345678901',NULL,2,'maria123'),
-('João Santos','joao@email.com','11991234567','98765432100',NULL,3,'joao123');
+('Weslei','weslei@email.com','11984106174','57030864859',NULL,1,'weslei123','2001-10-18'),
+('Maria Silva','maria@email.com','11987654321','12345678901',NULL,2,'maria123','2003-10-28'),
+('João Santos','joao@email.com','11991234567','98765432100',NULL,3,'joao123','2007-01-02');
 
 -- LAVANDERIAS
 
