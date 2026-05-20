@@ -53,6 +53,8 @@ CREATE TABLE usuario (
         REFERENCES endereco(endereco_id)
 );
 
+select * from endereco_motorista;
+
 CREATE TABLE lavanderia (
     lavanderia_id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
@@ -413,4 +415,15 @@ CREATE TABLE cartao_virtual (
     CONSTRAINT fk_cartao_virtual_motorista
         FOREIGN KEY (fk_motorista_id)
         REFERENCES motorista(motorista_id)
+);
+
+CREATE TABLE endereco_motorista (
+    endereco_motorista_id INT PRIMARY KEY AUTO_INCREMENT,
+    cep VARCHAR(8) NOT NULL,
+    uf VARCHAR(2) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    bairro VARCHAR(100) NOT NULL,
+    logradouro VARCHAR(100) NOT NULL,
+    numero VARCHAR(4) NOT NULL,
+    complemento VARCHAR(100)
 );

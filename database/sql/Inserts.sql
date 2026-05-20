@@ -44,6 +44,64 @@ VALUES
 ('04538132','SP','São Paulo','Itaim Bibi','Av Brigadeiro Faria Lima','3477','Térreo'),
 ('01310100','SP','São Paulo','Bela Vista','Av Paulista','1500','Loja A');
 
+-- ENDEREÇOS MOTORISTA
+
+INSERT INTO endereco_motorista (
+    cep,
+    uf,
+    cidade,
+    bairro,
+    logradouro,
+    numero,
+    complemento
+)
+VALUES
+(
+    '06657000',
+    'SP',
+    'Itapevi',
+    'Centro',
+    'Rua José Michelotti',
+    '120',
+    'Casa 1'
+),
+(
+    '06454000',
+    'SP',
+    'Barueri',
+    'Alphaville',
+    'Av. Andrômeda',
+    '850',
+    'Apartamento 12'
+),
+(
+    '06010000',
+    'SP',
+    'Osasco',
+    'Vila Yara',
+    'Rua dos Autonomistas',
+    '450',
+    'Bloco B'
+),
+(
+    '06700000',
+    'SP',
+    'Cotia',
+    'Granja Viana',
+    'Estrada da Capuava',
+    '77',
+    NULL
+),
+(
+    '06110000',
+    'SP',
+    'Carapicuíba',
+    'Centro',
+    'Rua XV de Novembro',
+    '300',
+    'Fundos'
+);
+
 -- USUÁRIOS
 
 INSERT INTO usuario (

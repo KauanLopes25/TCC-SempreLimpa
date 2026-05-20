@@ -11,7 +11,7 @@ USE sempre_limpa_db;
 
 CREATE TABLE endereco (
     endereco_id INT PRIMARY KEY AUTO_INCREMENT,
-    cep VARCHAR(11) NOT NULL,
+    cep VARCHAR(8) NOT NULL,
     uf VARCHAR(2) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
     bairro VARCHAR(100) NOT NULL,
@@ -51,10 +51,8 @@ CREATE TABLE usuario (
     e_mail VARCHAR(100) UNIQUE NOT NULL,
     telefone VARCHAR(11),
     cpf VARCHAR(11) UNIQUE,
-    rne VARCHAR(9),
     fk_endereco INT,
-    senha VARCHAR(12) NOT NULL,
-    data_nascimento DATE NOT null,
+    senha VARCHAR(255) NOT NULL,
 
     CONSTRAINT fk_usuario_endereco
         FOREIGN KEY (fk_endereco)
@@ -423,17 +421,6 @@ CREATE TABLE cartao_virtual (
         REFERENCES motorista(motorista_id)
 );
 
-CREATE TABLE endereco_motorista (
-    endereco_motorista_id INT PRIMARY KEY AUTO_INCREMENT,
-    cep VARCHAR(8) NOT NULL,
-    uf VARCHAR(2) NOT NULL,
-    cidade VARCHAR(100) NOT NULL,
-    bairro VARCHAR(100) NOT NULL,
-    logradouro VARCHAR(100) NOT NULL,
-    numero VARCHAR(4) NOT NULL,
-    complemento VARCHAR(100)
-);
-
 -- =========================================================
 -- INSERTS
 -- =========================================================
@@ -449,20 +436,6 @@ VALUES
 ('CANCELADO');
 
 -- ENDEREÇOS USUÁRIOS
-
-INSERT INTO endereco (
-    cep,
-    uf,
-    cidade,
-    bairro,
-    logradouro,
-    numero,
-    complemento
-)
-VALUES
-('06657300','SP','Itapevi','Rosemary','Rua Serra do Paracaima','1374',NULL),
-('06650000','SP','Jandira','Centro','Rua das Flores','200',NULL),
-('06400000','SP','Barueri','Alphaville','Av Alpha','1000','Bloco A');
 
 -- ENDEREÇOS LAVANDERIAS
 
@@ -480,38 +453,7 @@ VALUES
 ('04538132','SP','São Paulo','Itaim Bibi','Av Brigadeiro Faria Lima','3477','Térreo'),
 ('01310100','SP','São Paulo','Bela Vista','Av Paulista','1500','Loja A');
 
--- ENDEREÇOS MOTORISTA
-
-INSERT INTO endereco_motorista (
-cep, 
-uf, 
-cidade, 
-bairro, 
-logradouro, 
-numero, 
-complemento
-)
-VALUES 
-('01310200', 'SP', 'São Paulo', 'Bela Vista', 'Avenida Paulista', '1578', '9º andar'),
-('20040002', 'RJ', 'Rio de Janeiro', 'Centro', 'Avenida Rio Branco', '125', NULL),
-('30140010', 'MG', 'Belo Horizonte', 'Savassi', 'Rua Pernambuco', '45', 'Bloco B - Ap 402');
-
 -- USUÁRIOS
-
-INSERT INTO usuario (
-    nome,
-    e_mail,
-    telefone,
-    cpf,
-    rne,
-    fk_endereco,
-    senha,
-    data_nascimento
-)
-VALUES
-('Weslei','weslei@email.com','11984106174','57030864859',NULL,1,'weslei123','2001-10-18'),
-('Maria Silva','maria@email.com','11987654321','12345678901',NULL,2,'maria123','2003-10-28'),
-('João Santos','joao@email.com','11991234567','98765432100',NULL,3,'joao123','2007-01-02');
 
 -- LAVANDERIAS
 
@@ -571,91 +513,13 @@ VALUES
 
 -- CARTÕES
 
-INSERT INTO cartao (
-    usuario_id,
-    bandeira,
-    validade,
-    token_cartao,
-    ultimos_digitos
-)
-VALUES
-(
-    1,
-    'MASTER',
-    '1228',
-    'token_abc123',
-    '4562'
-);
-
 -- FAVORITOS
-
-INSERT INTO favoritos (
-    fk_usuario_id,
-    fk_lavanderia_id
-)
-VALUES
-(1,1),
-(1,2),
-(2,3);
 
 -- AVALIAÇÕES
 
-INSERT INTO avaliacao (
-    nota,
-    comentario,
-    fk_usuario_id,
-    fk_lavanderia_id
-)
-VALUES
-(5,'Excelente serviço',1,1),
-(4,'Muito boa',1,2),
-(3,'Pode melhorar',2,3);
-
 -- PEDIDOS
 
-INSERT INTO pedido (
-    valor_total,
-    taxa_entrega,
-    taxa_entregador,
-    taxa_app,
-    tempo_estimado,
-    fk_status_id,
-    fk_lavanderia_id,
-    fk_usuario_id
-)
-VALUES
-(
-    50.00,
-    10.00,
-    5.00,
-    6.00,
-    '01:30:00',
-    1,
-    1,
-    1
-),
-(
-    80.00,
-    15.00,
-    7.00,
-    6.00,
-    '02:00:00',
-    2,
-    2,
-    1
-);
-
 -- CESTO
-
-INSERT INTO cesto (
-    peso_estimado,
-    secagem,
-    tipo_lavagem,
-    fk_pedido_id
-)
-VALUES
-(5.5,'SIM','NORMAL',1),
-(8.0,'NAO','PESADA',2);
 
 -- ROUPAS
 
@@ -669,63 +533,11 @@ VALUES
 
 -- CESTO ROUPA
 
-INSERT INTO cesto_roupa (
-    fk_cesto_id,
-    fk_roupas_id,
-    quantidade
-)
-VALUES
-(1,1,5),
-(1,2,2),
-(2,3,1);
-
 -- ORDEM PAGAMENTO
-
-INSERT INTO ordem_pagamento (
-    tipo_pagamento,
-    valor,
-    status,
-    fk_pedido_id
-)
-VALUES
-('PIX',71.00,'PENDENTE',1),
-('CARTAO',108.00,'PAGO',2);
 
 -- PIX
 
-INSERT INTO pix (
-    chave_pix,
-    data_expiracao,
-    qr_code,
-    status,
-    fk_ordem_pagamento_id
-)
-VALUES
-(
-    'pix_123',
-    DATE_ADD(NOW(), INTERVAL 30 MINUTE),
-    'qr_code_pix',
-    'PENDENTE',
-    1
-);
-
 -- PAGAMENTO CARTÃO
-
-INSERT INTO pagamento_cartao (
-    token_utilizado,
-    ultimos_digitos,
-    tipo,
-    fk_cartao_id,
-    fk_ordem_pagamento_id
-)
-VALUES
-(
-    'token_abc123',
-    '4562',
-    'CREDITO',
-    1,
-    2
-);
 
 -- =========================================================
 -- VIEWS
