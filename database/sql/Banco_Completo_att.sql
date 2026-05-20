@@ -53,6 +53,7 @@ CREATE TABLE usuario (
     cpf VARCHAR(11) UNIQUE,
     fk_endereco INT,
     senha VARCHAR(255) NOT NULL,
+    data_nascimento DATE NOT NULL,
 
     CONSTRAINT fk_usuario_endereco
         FOREIGN KEY (fk_endereco)
