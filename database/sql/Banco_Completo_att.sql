@@ -51,6 +51,7 @@ CREATE TABLE usuario (
     e_mail VARCHAR(100) UNIQUE NOT NULL,
     telefone VARCHAR(11),
     cpf VARCHAR(11) UNIQUE,
+    rne VARCHAR(9),
     fk_endereco INT,
     senha VARCHAR(255) NOT NULL,
     data_nascimento DATE NOT NULL,
