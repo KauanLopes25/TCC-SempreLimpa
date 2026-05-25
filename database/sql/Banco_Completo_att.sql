@@ -9,6 +9,27 @@ USE sempre_limpa_db;
 -- TABELAS BASE
 -- =========================================================
 
+CREATE TABLE dados_bancarios (
+    dados_bancarios_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    digito VARCHAR(1) NOT NULL,
+    agencia VARCHAR(4) NOT NULL,
+
+    banco ENUM(
+        'nubank',
+        'picpay',
+        'mercadopago'
+    ),
+
+    tipo_conta ENUM(
+        'corrente',
+        'salario',
+        'poupanca'
+    ),
+
+    conta INT NOT NULL
+);
+
 CREATE TABLE endereco (
     endereco_id INT PRIMARY KEY AUTO_INCREMENT,
     cep VARCHAR(8) NOT NULL,
@@ -31,6 +52,17 @@ CREATE TABLE endereco_lavanderia (
     complemento VARCHAR(100)
 );
 
+CREATE TABLE endereco_motorista (
+    endereco_motorista_id INT PRIMARY KEY AUTO_INCREMENT,
+    cep VARCHAR(8) NOT NULL,
+    uf VARCHAR(2) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    bairro VARCHAR(100) NOT NULL,
+    logradouro VARCHAR(100) NOT NULL,
+    numero VARCHAR(4) NOT NULL,
+    complemento VARCHAR(100)
+);
+
 CREATE TABLE status (
     status_id INT PRIMARY KEY AUTO_INCREMENT,
     descricao VARCHAR(50) NOT NULL
@@ -42,7 +74,7 @@ CREATE TABLE roupas (
 );
 
 -- =========================================================
--- USUÁRIOS E LAVANDERIAS
+-- USUÁRIOS, LAVANDERIAS e MOTORISTAS
 -- =========================================================
 
 CREATE TABLE usuario (
@@ -82,6 +114,31 @@ CREATE TABLE lavanderia (
     CONSTRAINT fk_lavanderia_endereco
         FOREIGN KEY (fk_endereco_lavanderia)
         REFERENCES endereco_lavanderia(endereco_lavanderia_id)
+);
+
+CREATE TABLE motorista (
+    motorista_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    nome VARCHAR(100) NOT NULL,
+    data_nascimento DATE NOT NULL,
+
+    cpf VARCHAR(11) NOT NULL,
+    telefone VARCHAR(11) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    cnh VARCHAR(11),
+    foto VARCHAR(255) NOT NULL,
+
+    fk_dados_bancarios_id INT NOT NULL,
+    fk_endereco_motorista_id INT NOT NULL,
+
+    CONSTRAINT fk_motorista_dados_bancarios
+        FOREIGN KEY (fk_dados_bancarios_id)
+        REFERENCES dados_bancarios(dados_bancarios_id),
+
+    CONSTRAINT fk_motorista_endereco
+        FOREIGN KEY (fk_endereco_motorista_id)
+        REFERENCES endereco(endereco_id)
 );
 
 -- =========================================================
@@ -292,86 +349,6 @@ CREATE TABLE cartao_usuario (
 -- MOTORISTAS
 -- =========================================================
 
-CREATE TABLE dados_bancarios (
-    dados_bancarios_id INT PRIMARY KEY AUTO_INCREMENT,
-
-    digito VARCHAR(1) NOT NULL,
-    agencia VARCHAR(4) NOT NULL,
-
-    banco ENUM(
-        'nubank',
-        'picpay',
-        'mercadopago'
-    ),
-
-    tipo_conta ENUM(
-        'corrente',
-        'salario',
-        'poupanca'
-    ),
-
-    conta INT NOT NULL
-);
-
-CREATE TABLE dados_veiculo (
-    dados_veiculo_id INT PRIMARY KEY AUTO_INCREMENT,
-
-    placa VARCHAR(7) NOT NULL,
-    modelo VARCHAR(100) NOT NULL,
-    marca VARCHAR(100) NOT NULL,
-
-    ano_modelo YEAR NOT NULL,
-    ano_fabricacao YEAR NOT NULL,
-
-    cor VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE motorista (
-    motorista_id INT PRIMARY KEY AUTO_INCREMENT,
-
-    nome VARCHAR(100) NOT NULL,
-    data_nascimento DATE NOT NULL,
-
-    cpf VARCHAR(11) NOT NULL,
-    telefone VARCHAR(11) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    senha VARCHAR(255) NOT NULL,
-    cnh VARCHAR(11),
-    foto VARCHAR(255) NOT NULL,
-
-    fk_dados_bancarios_id INT NOT NULL,
-    fk_endereco_id INT NOT NULL,
-
-    CONSTRAINT fk_motorista_dados_bancarios
-        FOREIGN KEY (fk_dados_bancarios_id)
-        REFERENCES dados_bancarios(dados_bancarios_id),
-
-    CONSTRAINT fk_motorista_endereco
-        FOREIGN KEY (fk_endereco_id)
-        REFERENCES endereco(endereco_id)
-);
-
-CREATE TABLE veiculo (
-    veiculo_id INT PRIMARY KEY AUTO_INCREMENT,
-
-    modalidade ENUM(
-        'bike',
-        'carro',
-        'motocicleta'
-    ),
-
-    fk_motorista_id INT NOT NULL,
-    fk_dados_veiculo_id INT NOT NULL,
-
-    CONSTRAINT fk_veiculo_motorista
-        FOREIGN KEY (fk_motorista_id)
-        REFERENCES motorista(motorista_id),
-
-    CONSTRAINT fk_veiculo_dados
-        FOREIGN KEY (fk_dados_veiculo_id)
-        REFERENCES dados_veiculo(dados_veiculo_id)
-);
-
 CREATE TABLE avaliacao_motorista (
     avaliacao_motorista_id INT PRIMARY KEY AUTO_INCREMENT,
 
@@ -427,15 +404,38 @@ CREATE TABLE cartao_virtual (
         REFERENCES motorista(motorista_id)
 );
 
-CREATE TABLE endereco_motorista (
-    endereco_motorista_id INT PRIMARY KEY AUTO_INCREMENT,
-    cep VARCHAR(8) NOT NULL,
-    uf VARCHAR(2) NOT NULL,
-    cidade VARCHAR(100) NOT NULL,
-    bairro VARCHAR(100) NOT NULL,
-    logradouro VARCHAR(100) NOT NULL,
-    numero VARCHAR(4) NOT NULL,
-    complemento VARCHAR(100)
+CREATE TABLE dados_veiculo (
+    dados_veiculo_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    placa VARCHAR(7) NOT NULL,
+    modelo VARCHAR(100) NOT NULL,
+    marca VARCHAR(100) NOT NULL,
+
+    ano_modelo YEAR NOT NULL,
+    ano_fabricacao YEAR NOT NULL,
+
+    cor VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE veiculo (
+    veiculo_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    modalidade ENUM(
+        'bike',
+        'carro',
+        'motocicleta'
+    ),
+
+    fk_motorista_id INT NOT NULL,
+    fk_dados_veiculo_id INT NOT NULL,
+
+    CONSTRAINT fk_veiculo_motorista
+        FOREIGN KEY (fk_motorista_id)
+        REFERENCES motorista(motorista_id),
+
+    CONSTRAINT fk_veiculo_dados
+        FOREIGN KEY (fk_dados_veiculo_id)
+        REFERENCES dados_veiculo(dados_veiculo_id)
 );
 
 -- =========================================================
