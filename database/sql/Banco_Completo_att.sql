@@ -155,6 +155,7 @@ CREATE TABLE pedido (
     fk_status_id INT,
     fk_lavanderia_id INT,
     fk_usuario_id INT,
+    fk_motorista_id INT,
 
     CONSTRAINT fk_pedido_status
         FOREIGN KEY (fk_status_id)
@@ -166,7 +167,11 @@ CREATE TABLE pedido (
 
     CONSTRAINT fk_pedido_usuario
         FOREIGN KEY (fk_usuario_id)
-        REFERENCES usuario(usuario_id)
+        REFERENCES usuario(usuario_id),
+        
+	CONSTRAINT fk_pedido_motorista
+		FOREIGN KEY (fk_motorista_id)
+        REFERENCES motorista(motorista_id)
 );
 
 -- =========================================================
@@ -330,9 +335,8 @@ CREATE TABLE motorista (
     cpf VARCHAR(11) NOT NULL,
     telefone VARCHAR(11) NOT NULL,
     email VARCHAR(100) NOT NULL,
-
+    senha VARCHAR(255) NOT NULL,
     cnh VARCHAR(11),
-
     foto VARCHAR(255) NOT NULL,
 
     fk_dados_bancarios_id INT NOT NULL,
@@ -421,6 +425,17 @@ CREATE TABLE cartao_virtual (
     CONSTRAINT fk_cartao_virtual_motorista
         FOREIGN KEY (fk_motorista_id)
         REFERENCES motorista(motorista_id)
+);
+
+CREATE TABLE endereco_motorista (
+    endereco_motorista_id INT PRIMARY KEY AUTO_INCREMENT,
+    cep VARCHAR(8) NOT NULL,
+    uf VARCHAR(2) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    bairro VARCHAR(100) NOT NULL,
+    logradouro VARCHAR(100) NOT NULL,
+    numero VARCHAR(4) NOT NULL,
+    complemento VARCHAR(100)
 );
 
 -- =========================================================
