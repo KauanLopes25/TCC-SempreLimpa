@@ -560,6 +560,26 @@ VALUES
 -- VIEWS
 -- =========================================================
 
+-- View para perfil completo do usuário
+CREATE OR REPLACE VIEW vw_usuario_endereco_detalhado AS
+SELECT
+    u.usuario_id,
+    u.nome,
+    u.e_mail,
+    u.cpf,
+    u.telefone,
+    u.data_nascimento,
+    e.cep,
+    e.uf,
+    e.cidade,
+    e.bairro,
+    e.logradouro,
+    e.numero,
+    e.complemento
+FROM usuario u
+INNER JOIN endereco e
+    ON e.endereco_id = u.fk_endereco;
+
 CREATE VIEW vw_avaliacoes AS
 SELECT
     l.nome AS lavanderia,
