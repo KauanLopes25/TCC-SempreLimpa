@@ -736,6 +736,43 @@ GROUP BY l.lavanderia_id, l.nome
 
 ORDER BY total_pedidos DESC;
 
+CREATE OR REPLACE VIEW vw_home_usuario_pedidos AS
+SELECT
+    p.pedido_id,
+
+    u.usuario_id,
+    u.nome AS nome_usuario,
+
+    s.descricao AS status_pedido,
+
+    p.valor_total,
+
+    p.tempo_estimado,
+
+    p.data AS data_pedido,
+
+    COUNT(c.cesto_id) AS quantidade_cestos
+
+FROM pedido p
+
+INNER JOIN usuario u
+    ON u.usuario_id = p.fk_usuario_id
+
+INNER JOIN status s
+    ON s.status_id = p.fk_status_id
+
+LEFT JOIN cesto c
+    ON c.fk_pedido_id = p.pedido_id
+
+GROUP BY
+    p.pedido_id,
+    u.usuario_id,
+    u.nome,
+    s.descricao,
+    p.valor_total,
+    p.tempo_estimado,
+    p.data;
+
 -- =========================================================
 -- TRIGGERS
 -- =========================================================
