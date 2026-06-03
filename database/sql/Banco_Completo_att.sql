@@ -138,7 +138,7 @@ CREATE TABLE motorista (
 
     CONSTRAINT fk_motorista_endereco
         FOREIGN KEY (fk_endereco_motorista_id)
-        REFERENCES endereco(endereco_id)
+        REFERENCES endereco_motorista(endereco_motorista_id)
 );
 
 -- =========================================================
