@@ -345,7 +345,6 @@ CREATE TABLE cartao_usuario (
         REFERENCES cartao(cartao_id)
         ON DELETE CASCADE
 );
-
 -- =========================================================
 -- MOTORISTAS
 -- =========================================================
@@ -534,7 +533,17 @@ VALUES
 -- FAVORITOS
 
 -- AVALIAÇÕES
-
+INSERT INTO avaliacao (nota, comentario, fk_usuario_id, fk_lavanderia_id) VALUES
+(5, 'Serviço excelente da 5asec! As camisetas voltaram impecáveis e muito cheirosas.', 1, 1),
+(4, 'A White Bubble entregou dentro do prazo. Muito prático o sistema de lavagem ecológica.', 1, 2),
+(5, 'A Super Clean tirou manchas pesadas do meu cobertor que achei que não sairiam mais. Recomendo demais!', 1, 3),
+(5, 'Excelente serviço, recomendo.', 1, 1),
+(4, 'Muito boa, mas preço salgado.', 1, 1),
+(2, 'A roupa voltou um pouco úmida.', 1, 2),
+(1, 'Demoraram o dobro do prazo.', 1, 2),
+(3, 'Atendimento bom, mas faltou organização.', 1, 2),
+(3, 'Preço justo, mas espaço bagunçado.', 1, 3),
+(4, 'Limpeza pesada de ótima qualidade.', 1, 3);
 -- PEDIDOS
 
 -- CESTO
@@ -789,6 +798,64 @@ GROUP BY
     p.tempo_estimado,
     p.data;
 
+-- View para filtro de lavanderias por avaliação, preço e localização --
+CREATE OR REPLACE VIEW vw_lavanderias_filtros AS
+SELECT 
+    l.lavanderia_id,
+    l.nome,
+    l.descricao,
+    l.tempo_padrao_lavagem,
+    l.preco_padrao_lavagem,
+    l.tempo_secagem,
+    l.preco_padrao_secagem,
+    l.logo,
+    e.cidade,
+    e.bairro,
+    e.uf,
+    COALESCE(ROUND(AVG(a.nota), 1), 0) AS media_avaliacao
+FROM 
+    lavanderia l
+INNER JOIN 
+    endereco_lavanderia e ON l.fk_endereco_lavanderia = e.endereco_lavanderia_id
+LEFT JOIN 
+    avaliacao a ON l.lavanderia_id = a.fk_lavanderia_id
+GROUP BY 
+    l.lavanderia_id, 
+    l.nome, 
+    l.descricao,
+    l.tempo_padrao_lavagem,
+    l.preco_padrao_lavagem,
+    l.tempo_secagem,
+    l.preco_padrao_secagem,
+    l.logo,
+    e.cidade, 
+    e.bairro, 
+    e.uf;    
+
+-- View para visualizaão de lavanderias completas com média de avaliação --
+CREATE OR REPLACE VIEW vw_lavanderia_endereco AS
+SELECT 
+    l.*, 
+    e.cep,
+    e.uf,
+    e.cidade,
+    e.bairro,
+    e.logradouro,
+    e.numero,
+    e.complemento,
+    COALESCE(ROUND(AVG(a.nota), 1), 0) AS media_avaliacao
+FROM 
+    lavanderia AS l
+INNER JOIN 
+    endereco_lavanderia AS e 
+    ON l.fk_endereco_lavanderia = e.endereco_lavanderia_id
+LEFT JOIN 
+    avaliacao AS a 
+    ON l.lavanderia_id = a.fk_lavanderia_id
+GROUP BY 
+    l.lavanderia_id, 
+    e.endereco_lavanderia_id;
+
 -- =========================================================
 -- TRIGGERS
 -- =========================================================
@@ -830,7 +897,7 @@ END $$
 DELIMITER ;
 
 -- =========================================================
--- PROCEDURE
+-- PROCEDURES
 -- =========================================================
 
 DELIMITER $$
