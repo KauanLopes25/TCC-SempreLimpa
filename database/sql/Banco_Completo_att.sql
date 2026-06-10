@@ -5,10 +5,11 @@
 DROP DATABASE IF EXISTS sempre_limpa_db;
 CREATE DATABASE sempre_limpa_db;
 USE sempre_limpa_db;
+select * from usuario;
+select * from endereco;
 -- =========================================================
 -- TABELAS BASE
 -- =========================================================
-
 CREATE TABLE dados_bancarios (
     dados_bancarios_id INT PRIMARY KEY AUTO_INCREMENT,
 
@@ -564,11 +565,15 @@ VALUES
 CREATE OR REPLACE VIEW vw_usuario_endereco_detalhado AS
 SELECT
     u.usuario_id,
+
+    u.fk_endereco AS endereco_id,
+
     u.nome,
     u.e_mail,
     u.cpf,
     u.telefone,
     u.data_nascimento,
+
     e.cep,
     e.uf,
     e.cidade,
@@ -576,10 +581,13 @@ SELECT
     e.logradouro,
     e.numero,
     e.complemento
+
 FROM usuario u
+
 INNER JOIN endereco e
     ON e.endereco_id = u.fk_endereco;
 
+-- View para filtro de lavanderia por avaliação
 CREATE VIEW vw_avaliacoes AS
 SELECT
     l.nome AS lavanderia,
@@ -593,6 +601,7 @@ INNER JOIN usuario u
 INNER JOIN lavanderia l
     ON l.lavanderia_id = a.fk_lavanderia_id;
 
+-- View para filtro de media de avaliação das lavanderias
 CREATE VIEW vw_media_lavanderia AS
 SELECT
     l.lavanderia_id,
@@ -603,6 +612,7 @@ LEFT JOIN avaliacao a
     ON a.fk_lavanderia_id = l.lavanderia_id
 GROUP BY l.lavanderia_id, l.nome;
 
+-- View para perfil completo do usuário
 CREATE VIEW vw_usuario_endereco_perfil AS
 SELECT
     u.usuario_id,
@@ -621,6 +631,7 @@ FROM usuario u
 INNER JOIN endereco e
     ON e.endereco_id = u.fk_endereco;
 
+-- View para pedido completo
 CREATE VIEW vw_pedido_completo AS
 SELECT
     p.pedido_id,
@@ -639,6 +650,7 @@ INNER JOIN lavanderia l
 INNER JOIN status s
     ON s.status_id = p.fk_status_id;
 
+-- View para pagamento detalhado
 CREATE VIEW vw_pagamento_detalhado AS
 SELECT
     op.ordem_pagamento_id,
@@ -663,6 +675,7 @@ LEFT JOIN pix px
 INNER JOIN pedido p
     ON p.pedido_id = op.fk_pedido_id;
 
+-- View para cestos de roupas
 CREATE VIEW vw_cesto_roupas AS
 SELECT
     c.cesto_id,
@@ -684,6 +697,7 @@ INNER JOIN usuario u
 INNER JOIN lavanderia l
     ON l.lavanderia_id = f.fk_lavanderia_id;
 
+-- View para visualizaão de lavanderias completas
 CREATE VIEW vw_lavanderias_completas AS
 SELECT
     l.lavanderia_id,
@@ -706,6 +720,7 @@ INNER JOIN endereco_lavanderia e
     ON l.fk_endereco_lavanderia =
        e.endereco_lavanderia_id;
 
+-- View para filtro de lavanderias por preço
 CREATE VIEW vw_lavanderias_preco AS
 SELECT
     lavanderia_id,
@@ -720,6 +735,7 @@ SELECT
 
 FROM lavanderia;
 
+-- View para filtro de lavandeiras com mais pedidos feitos
 CREATE VIEW vw_lavanderias_populares AS
 SELECT
     l.lavanderia_id,
