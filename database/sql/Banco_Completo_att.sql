@@ -345,7 +345,6 @@ CREATE TABLE cartao_usuario (
         REFERENCES cartao(cartao_id)
         ON DELETE CASCADE
 );
-
 -- =========================================================
 -- MOTORISTAS
 -- =========================================================
@@ -534,7 +533,17 @@ VALUES
 -- FAVORITOS
 
 -- AVALIAÇÕES
-
+INSERT INTO avaliacao (nota, comentario, fk_usuario_id, fk_lavanderia_id) VALUES
+(5, 'Serviço excelente da 5asec! As camisetas voltaram impecáveis e muito cheirosas.', 1, 1),
+(4, 'A White Bubble entregou dentro do prazo. Muito prático o sistema de lavagem ecológica.', 1, 2),
+(5, 'A Super Clean tirou manchas pesadas do meu cobertor que achei que não sairiam mais. Recomendo demais!', 1, 3),
+(5, 'Excelente serviço, recomendo.', 1, 1),
+(4, 'Muito boa, mas preço salgado.', 1, 1),
+(2, 'A roupa voltou um pouco úmida.', 1, 2),
+(1, 'Demoraram o dobro do prazo.', 1, 2),
+(3, 'Atendimento bom, mas faltou organização.', 1, 2),
+(3, 'Preço justo, mas espaço bagunçado.', 1, 3),
+(4, 'Limpeza pesada de ótima qualidade.', 1, 3);
 -- PEDIDOS
 
 -- CESTO
