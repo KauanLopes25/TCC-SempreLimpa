@@ -752,7 +752,6 @@ GROUP BY l.lavanderia_id, l.nome
 
 ORDER BY total_pedidos DESC;
 
--- View para pedidos do usuário na home
 CREATE OR REPLACE VIEW vw_home_usuario_pedidos AS
 SELECT
     p.pedido_id,
@@ -789,64 +788,6 @@ GROUP BY
     p.valor_total,
     p.tempo_estimado,
     p.data;
-    
--- View para filtros de lavanderias
-CREATE OR REPLACE VIEW vw_lavanderias_filtros AS
-SELECT 
-    l.lavanderia_id,
-    l.nome,
-    l.descricao,
-    l.tempo_padrao_lavagem,
-    l.preco_padrao_lavagem,
-    l.tempo_secagem,
-    l.preco_padrao_secagem,
-    l.logo,
-    e.cidade,
-    e.bairro,
-    e.uf,
-    COALESCE(ROUND(AVG(a.nota), 1), 0) AS media_avaliacao
-FROM 
-    lavanderia l
-INNER JOIN 
-    endereco_lavanderia e ON l.fk_endereco_lavanderia = e.endereco_lavanderia_id
-LEFT JOIN 
-    avaliacao a ON l.lavanderia_id = a.fk_lavanderia_id
-GROUP BY 
-    l.lavanderia_id, 
-    l.nome, 
-    l.descricao,
-    l.tempo_padrao_lavagem,
-    l.preco_padrao_lavagem,
-    l.tempo_secagem,
-    l.preco_padrao_secagem,
-    l.logo,
-    e.cidade, 
-    e.bairro, 
-    e.uf;
-    
--- View para visualização das lavandeiras
-CREATE OR REPLACE VIEW vw_lavanderia_endereco AS
-SELECT 
-    l.*, 
-    e.cep,
-    e.uf,
-    e.cidade,
-    e.bairro,
-    e.logradouro,
-    e.numero,
-    e.complemento,
-    COALESCE(ROUND(AVG(a.nota), 1), 0) AS media_avaliacao
-FROM 
-    lavanderia AS l
-INNER JOIN 
-    endereco_lavanderia AS e 
-    ON l.fk_endereco_lavanderia = e.endereco_lavanderia_id
-LEFT JOIN 
-    avaliacao AS a 
-    ON l.lavanderia_id = a.fk_lavanderia_id
-GROUP BY 
-    l.lavanderia_id, 
-    e.endereco_lavanderia_id;
 
 -- =========================================================
 -- TRIGGERS
