@@ -722,6 +722,60 @@ GROUP BY
     l.lavanderia_id, 
     e.endereco_lavanderia_id;
 
+-- View para detalhes completos do pedido, incluindo status, lavanderia, motorista, pagamento, cesto e roupas
+CREATE OR REPLACE VIEW vw_detalhes_pedido AS
+SELECT
+    p.pedido_id,
+
+    p.data,
+
+    p.valor_total,
+    p.taxa_entrega,
+    p.taxa_entregador,
+    p.taxa_app,
+
+    p.tempo_estimado,
+
+    s.descricao AS status,
+
+    l.nome AS lavanderia,
+
+    m.nome AS motorista,
+
+    op.tipo_pagamento,
+    op.status AS status_pagamento,
+
+    c.cesto_id,
+    c.peso_estimado,
+    c.secagem,
+    c.tipo_lavagem,
+
+    r.nome_peca,
+
+    cr.quantidade
+
+FROM pedido p
+
+INNER JOIN status s
+    ON s.status_id = p.fk_status_id
+
+INNER JOIN lavanderia l
+    ON l.lavanderia_id = p.fk_lavanderia_id
+
+LEFT JOIN motorista m
+    ON m.motorista_id = p.fk_motorista_id
+
+LEFT JOIN ordem_pagamento op
+    ON op.fk_pedido_id = p.pedido_id
+
+LEFT JOIN cesto c
+    ON c.fk_pedido_id = p.pedido_id
+
+LEFT JOIN cesto_roupa cr
+    ON cr.fk_cesto_id = c.cesto_id
+
+LEFT JOIN roupas r
+    ON r.id = cr.fk_roupas_id;
 -- =========================================================
 -- TRIGGERS
 -- =========================================================
