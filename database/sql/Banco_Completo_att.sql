@@ -127,6 +127,7 @@ CREATE TABLE motorista (
     senha VARCHAR(255) NOT NULL,
     cnh VARCHAR(11),
     foto VARCHAR(255) NOT NULL,
+    status_motorista ENUM('OFFLINE','DISPONIVEL','OCUPADO') NOT NULL DEFAULT 'OFFLINE',
 
     fk_dados_bancarios_id INT NOT NULL,
     fk_endereco_motorista_id INT NOT NULL,
@@ -255,6 +256,7 @@ CREATE TABLE cesto_roupa (
     fk_roupas_id INT,
 
     quantidade INT,
+    cor VARCHAR(50) NOT NULL DEFAULT "Não específicado",
 
     PRIMARY KEY (fk_cesto_id, fk_roupas_id),
 
@@ -435,6 +437,163 @@ CREATE TABLE veiculo (
         FOREIGN KEY (fk_dados_veiculo_id)
         REFERENCES dados_veiculo(dados_veiculo_id)
 );
+
+CREATE TABLE localizacao (
+    localizacao_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    fk_motorista_id INT NULL,
+    fk_usuario_id INT NULL,
+    fk_lavanderia_id INT NULL,
+
+    latitude DECIMAL(10,8) NOT NULL,
+    longitude DECIMAL(11,8) NOT NULL,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_localizacao_motorista
+        FOREIGN KEY (fk_motorista_id)
+        REFERENCES motorista(motorista_id),
+        
+	CONSTRAINT fk_localizacao_usuario
+        FOREIGN KEY (fk_usuario_id)
+        REFERENCES usuario(usuario_id),
+        
+	CONSTRAINT fk_localizacao_lavanderia
+        FOREIGN KEY (fk_lavanderia_id)
+        REFERENCES lavanderia(lavanderia_id),
+        
+	CONSTRAINT chk_apenas_um
+        CHECK (
+            (fk_motorista_id IS NOT NULL AND fk_usuario_id IS NULL AND fk_lavanderia_id IS NULL)
+            OR
+            (fk_motorista_id IS NULL AND fk_usuario_id IS NOT NULL AND fk_lavanderia_id IS NULL)
+            OR
+            (fk_motorista_id IS NULL AND fk_usuario_id IS NULL AND fk_lavanderia_id IS NOT NULL)
+        )
+);
+
+-- =========================================================
+-- INSERTS
+-- =========================================================
+
+-- STATUS
+
+INSERT INTO status (descricao)
+VALUES
+('PENDENTE'),
+('PAGO'),
+('EM_ANDAMENTO'),
+('FINALIZADO'),
+('CANCELADO');
+
+-- ENDEREÇOS USUÁRIOS
+
+-- ENDEREÇOS LAVANDERIAS
+
+INSERT INTO endereco_lavanderia (
+    cep,
+    uf,
+    cidade,
+    bairro,
+    logradouro,
+    numero,
+    complemento
+)
+VALUES
+('01001000','SP','São Paulo','Centro','Praça da Sé','100','Sala 1'),
+('04538132','SP','São Paulo','Itaim Bibi','Av Brigadeiro Faria Lima','3477','Térreo'),
+('01310100','SP','São Paulo','Bela Vista','Av Paulista','1500','Loja A');
+
+-- USUÁRIOS
+
+-- LAVANDERIAS
+
+INSERT INTO lavanderia (
+    nome,
+    descricao,
+    cnpj,
+    tempo_padrao_lavagem,
+    tempo_secagem,
+    preco_padrao_lavagem,
+    preco_padrao_secagem,
+    logo,
+    e_mail,
+    telefone,
+    fk_endereco_lavanderia
+)
+VALUES
+(
+    '5asec',
+    'Lavagem premium',
+    '04078995000245',
+    '01:00:00',
+    '00:30:00',
+    30.00,
+    15.00,
+    'logo1.png',
+    '5asec@test.com',
+    '11999999998',
+    1
+),
+(
+    'White Bubble',
+    'Lavagem ecológica',
+    '12345678000199',
+    '01:30:00',
+    '00:40:00',
+    25.50,
+    12.00,
+    'logo2.png',
+    'bubble@test.com',
+    '11988888888',
+    2
+),
+(
+    'Super Clean',
+    'Lavagem pesada',
+    '98765432000188',
+    '02:00:00',
+    '01:00:00',
+    40.00,
+    20.00,
+    'logo3.png',
+    'superclean@test.com',
+    '11977777777',
+    3
+);
+
+-- CARTÕES
+
+-- FAVORITOS
+
+-- AVALIAÇÕES
+
+-- PEDIDOS
+
+-- CESTO
+
+-- ROUPAS
+
+INSERT INTO roupas (
+    nome_peca
+)
+VALUES
+('Camiseta'),
+('Calça'),
+('Cobertor');
+
+-- CESTO ROUPA
+
+-- ORDEM PAGAMENTO
+
+-- PIX
+
+-- PAGAMENTO CARTÃO
+
+-- =========================================================
+-- VIEWS
+-- =========================================================
 
 -- View para perfil completo do usuário
 CREATE OR REPLACE VIEW vw_usuario_endereco_detalhado AS
@@ -627,6 +786,7 @@ GROUP BY l.lavanderia_id, l.nome
 
 ORDER BY total_pedidos DESC;
 
+-- View para pedidos do usuário na home
 CREATE OR REPLACE VIEW vw_home_usuario_pedidos AS
 SELECT
     p.pedido_id,
@@ -663,8 +823,8 @@ GROUP BY
     p.valor_total,
     p.tempo_estimado,
     p.data;
-
--- View para filtro de lavanderias por avaliação, preço e localização --
+    
+-- View para filtros de lavanderias
 CREATE OR REPLACE VIEW vw_lavanderias_filtros AS
 SELECT 
     l.lavanderia_id,
@@ -696,9 +856,9 @@ GROUP BY
     l.logo,
     e.cidade, 
     e.bairro, 
-    e.uf;    
-
--- View para visualizaão de lavanderias completas com média de avaliação --
+    e.uf;
+    
+-- View para visualização das lavandeiras
 CREATE OR REPLACE VIEW vw_lavanderia_endereco AS
 SELECT 
     l.*, 
@@ -817,7 +977,7 @@ END $$
 DELIMITER ;
 
 -- =========================================================
--- PROCEDURES
+-- PROCEDURE
 -- =========================================================
 
 DELIMITER $$
