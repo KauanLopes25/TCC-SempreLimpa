@@ -220,6 +220,7 @@ CREATE TABLE pedido (
     tempo_estimado TIME,
 
     fk_status_pedido_id INT,
+    status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     fk_lavanderia_id INT,
     fk_usuario_id INT,
     fk_motorista_id INT,
