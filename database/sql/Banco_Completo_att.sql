@@ -808,7 +808,7 @@ SELECT
     u.usuario_id,
     u.nome AS nome_usuario,
 
-    s.descricao AS status_pedido,
+    s.progresso AS status_pedido,
 
     p.valor_total,
 
@@ -823,8 +823,8 @@ FROM pedido p
 INNER JOIN usuario u
     ON u.usuario_id = p.fk_usuario_id
 
-INNER JOIN status s
-    ON s.status_id = p.fk_status_id
+INNER JOIN status_pedido s
+    ON s.status_pedido_id = p.fk_status_pedido_id
 
 LEFT JOIN cesto c
     ON c.fk_pedido_id = p.pedido_id
@@ -833,7 +833,7 @@ GROUP BY
     p.pedido_id,
     u.usuario_id,
     u.nome,
-    s.descricao,
+    s.progresso,
     p.valor_total,
     p.tempo_estimado,
     p.data;
@@ -910,7 +910,7 @@ SELECT
 
     p.tempo_estimado,
 
-    s.descricao AS status,
+    s.progresso AS status_pedido,
 
     l.nome AS lavanderia,
 
@@ -930,8 +930,8 @@ SELECT
 
 FROM pedido p
 
-INNER JOIN status s
-    ON s.status_id = p.fk_status_id
+INNER JOIN status_pedido s
+    ON s.status_pedido_id = p.fk_status_pedido_id
 
 INNER JOIN lavanderia l
     ON l.lavanderia_id = p.fk_lavanderia_id
@@ -1042,7 +1042,7 @@ BEGIN
         taxa_entregador,
         taxa_app,
         tempo_estimado,
-        fk_status_id,
+        fk_status_pedido_id,
         fk_lavanderia_id,
         fk_usuario_id
     )
@@ -1064,7 +1064,7 @@ BEGIN
         tipo_pagamento,
         valor,
         data_criacao,
-        status,
+        status_pedido,
         fk_pedido_id
     )
     VALUES (
@@ -1083,7 +1083,7 @@ BEGIN
             chave_pix,
             data_expiracao,
             qr_code,
-            status,
+            status_pedido,
             fk_ordem_pagamento_id
         )
         VALUES (
@@ -1149,12 +1149,15 @@ DELIMITER ;
 
 -- STATUS
 
-INSERT INTO status (descricao)
-VALUES
-('PENDENTE'),
-('PAGO'),
-('EM_ANDAMENTO'),
-('FINALIZADO'),
+INSERT INTO status_pedido (progresso) VALUES
+('SOLICITADO'),
+('ATRIBUIDO'),
+('COLETANDO'),
+('EM_TRANSITO'),
+('LAVANDO'),
+('SECANDO'),
+('RETORNANDO'),
+('ENTREGUE'),
 ('CANCELADO');
 
 -- ENDEREÇOS USUÁRIOS
@@ -1232,7 +1235,7 @@ VALUES
 (
     '5asec',
     'Lavagem premium',
-    '04078995000245',
+    '04078995090245',
     '01:00:00',
     '00:30:00',
     30.00,
@@ -1245,7 +1248,7 @@ VALUES
 (
     'White Bubble',
     'Lavagem ecológica',
-    '12345678000199',
+    '12345678040199',
     '01:30:00',
     '00:40:00',
     25.50,
@@ -1258,7 +1261,7 @@ VALUES
 (
     'Super Clean',
     'Lavagem pesada',
-    '98765432000188',
+    '98765432060188',
     '02:00:00',
     '01:00:00',
     40.00,
@@ -1430,7 +1433,7 @@ INSERT INTO pedido (
     taxa_entregador,
     taxa_app,
     tempo_estimado,
-    fk_status_id,
+    fk_status_pedido_id,
     fk_lavanderia_id,
     fk_usuario_id,
     fk_motorista_id
