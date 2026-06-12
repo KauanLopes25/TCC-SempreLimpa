@@ -1001,7 +1001,7 @@ BEGIN
     DECLARE v_ordem_id INT;
     DECLARE v_valor_final DECIMAL(10,2);
     DECLARE v_cartao_existe INT DEFAULT 0;
-    DECLARE v_taxa_entregador DECIMAL(10,2) DEFAULT 20.00;
+    DECLARE v_taxa_entregador DECIMAL(10,2) DEFAULT 00.00;
     DECLARE v_taxa_app DECIMAL(10,2) DEFAULT 6.00;
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
