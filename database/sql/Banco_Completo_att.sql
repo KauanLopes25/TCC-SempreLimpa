@@ -488,19 +488,6 @@ CREATE TABLE localizacao (
 -- INSERTS
 -- =========================================================
 
--- STATUS
-
-INSERT INTO status_pedido (progresso) VALUES
-('SOLICITADO'),
-('ATRIBUIDO'),
-('COLETANDO'),
-('EM_TRANSITO'),
-('LAVANDO'),
-('SECANDO'),
-('RETORNANDO'),
-('ENTREGUE'),
-('CANCELADO');
-
 -- ENDEREÇOS USUÁRIOS
 
 -- ENDEREÇOS LAVANDERIAS
