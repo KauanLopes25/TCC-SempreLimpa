@@ -882,6 +882,60 @@ GROUP BY
     l.lavanderia_id, 
     e.endereco_lavanderia_id;
 
+-- View para detalhes completos do pedido, incluindo status, lavanderia, motorista, pagamento, cesto e roupas
+CREATE OR REPLACE VIEW vw_detalhes_pedido AS
+SELECT
+    p.pedido_id,
+
+    p.data,
+
+    p.valor_total,
+    p.taxa_entrega,
+    p.taxa_entregador,
+    p.taxa_app,
+
+    p.tempo_estimado,
+
+    s.descricao AS status,
+
+    l.nome AS lavanderia,
+
+    m.nome AS motorista,
+
+    op.tipo_pagamento,
+    op.status AS status_pagamento,
+
+    c.cesto_id,
+    c.peso_estimado,
+    c.secagem,
+    c.tipo_lavagem,
+
+    r.nome_peca,
+
+    cr.quantidade
+
+FROM pedido p
+
+INNER JOIN status s
+    ON s.status_id = p.fk_status_id
+
+INNER JOIN lavanderia l
+    ON l.lavanderia_id = p.fk_lavanderia_id
+
+LEFT JOIN motorista m
+    ON m.motorista_id = p.fk_motorista_id
+
+LEFT JOIN ordem_pagamento op
+    ON op.fk_pedido_id = p.pedido_id
+
+LEFT JOIN cesto c
+    ON c.fk_pedido_id = p.pedido_id
+
+LEFT JOIN cesto_roupa cr
+    ON cr.fk_cesto_id = c.cesto_id
+
+LEFT JOIN roupas r
+    ON r.id = cr.fk_roupas_id;
 -- =========================================================
 -- TRIGGERS
 -- =========================================================
@@ -1074,3 +1128,361 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- =========================================================
+-- INSERTS
+-- =========================================================
+
+-- STATUS
+
+INSERT INTO status (descricao)
+VALUES
+('PENDENTE'),
+('PAGO'),
+('EM_ANDAMENTO'),
+('FINALIZADO'),
+('CANCELADO');
+
+-- ENDEREÇOS USUÁRIOS
+
+INSERT INTO endereco (
+    cep,
+    uf,
+    cidade,
+    bairro,
+    logradouro,
+    numero,
+    complemento
+)
+VALUES (
+    '18160000',
+    'SP',
+    'Salto de Pirapora',
+    'Centro',
+    'Rua José Benedito de Oliveira',
+    '123',
+    'Casa'
+);
+
+-- ENDEREÇOS LAVANDERIAS
+
+INSERT INTO endereco_lavanderia (
+    cep,
+    uf,
+    cidade,
+    bairro,
+    logradouro,
+    numero,
+    complemento
+)
+VALUES
+('01001000','SP','São Paulo','Centro','Praça da Sé','100','Sala 1'),
+('04538132','SP','São Paulo','Itaim Bibi','Av Brigadeiro Faria Lima','3477','Térreo'),
+('01310100','SP','São Paulo','Bela Vista','Av Paulista','1500','Loja A');
+
+INSERT INTO usuario (
+    nome,
+    e_mail,
+    telefone,
+    cpf,
+    fk_endereco,
+    senha,
+    data_nascimento
+)
+VALUES (
+    'Kauan Lopes',
+    'kauan.lopes02@hotmail.com',
+    '15999999999',
+    '38748497835',
+    1,
+    '$2b$10$senhahash',
+    '2000-01-01'
+);
+
+-- LAVANDERIAS
+
+INSERT INTO lavanderia (
+    nome,
+    descricao,
+    cnpj,
+    tempo_padrao_lavagem,
+    tempo_secagem,
+    preco_padrao_lavagem,
+    preco_padrao_secagem,
+    logo,
+    e_mail,
+    telefone,
+    fk_endereco_lavanderia
+)
+VALUES
+(
+    '5asec',
+    'Lavagem premium',
+    '04078995000245',
+    '01:00:00',
+    '00:30:00',
+    30.00,
+    15.00,
+    'logo1.png',
+    '5asec@test.com',
+    '11999999998',
+    1
+),
+(
+    'White Bubble',
+    'Lavagem ecológica',
+    '12345678000199',
+    '01:30:00',
+    '00:40:00',
+    25.50,
+    12.00,
+    'logo2.png',
+    'bubble@test.com',
+    '11988888888',
+    2
+),
+(
+    'Super Clean',
+    'Lavagem pesada',
+    '98765432000188',
+    '02:00:00',
+    '01:00:00',
+    40.00,
+    20.00,
+    'logo3.png',
+    'superclean@test.com',
+    '11977777777',
+    3
+);
+
+-- CARTÕES
+
+-- FAVORITOS
+
+-- AVALIAÇÕES
+
+-- ROUPAS
+INSERT INTO roupas (nome_peca) VALUES
+('Camiseta'),
+('Camisa Social'),
+('Calça Jeans'),
+('Calça Social'),
+('Bermuda'),
+('Short'),
+('Vestido'),
+('Saia'),
+('Blusa'),
+('Moletom'),
+('Jaqueta'),
+('Casaco'),
+('Terno'),
+('Blazer'),
+('Gravata'),
+('Pijama'),
+('Roupa Íntima'),
+('Meia'),
+('Toalha de Banho'),
+('Toalha de Rosto'),
+('Lençol'),
+('Fronha'),
+('Cobertor'),
+('Edredom'),
+('Manta'),
+('Tapete'),
+('Cortina'),
+('Uniforme Escolar'),
+('Uniforme Profissional'),
+('Avental'),
+('Macacão'),
+('Roupa de Bebê'),
+('Roupa de Academia'),
+('Roupa de Praia'),
+('Biquíni'),
+('Sunga'),
+('Tênis'),
+('Boné'),
+('Cachecol'),
+('Luvas');
+
+-- ORDEM PAGAMENTO
+
+-- PIX
+
+-- PAGAMENTO CARTÃO
+
+-- ==========================================
+-- DADOS BANCÁRIOS
+-- ==========================================
+
+INSERT INTO dados_bancarios (
+    digito,
+    agencia,
+    banco,
+    tipo_conta,
+    conta
+)
+VALUES
+('1', '1234', 'nubank', 'corrente', 123456),
+('2', '5678', 'mercadopago', 'poupanca', 654321);
+
+-- ==========================================
+-- ENDEREÇOS MOTORISTAS
+-- ==========================================
+
+INSERT INTO endereco_motorista (
+    cep,
+    uf,
+    cidade,
+    bairro,
+    logradouro,
+    numero,
+    complemento
+)
+VALUES
+(
+    '01001000',
+    'SP',
+    'São Paulo',
+    'Centro',
+    'Rua da Consolação',
+    '100',
+    'Apto 12'
+),
+(
+    '13010000',
+    'SP',
+    'Campinas',
+    'Cambuí',
+    'Rua Barreto Leme',
+    '250',
+    'Casa'
+);
+
+-- ==========================================
+-- MOTORISTAS
+-- ==========================================
+
+INSERT INTO motorista (
+    nome,
+    data_nascimento,
+    cpf,
+    telefone,
+    email,
+    senha,
+    cnh,
+    foto,
+    fk_dados_bancarios_id,
+    fk_endereco_motorista_id
+)
+VALUES
+(
+    'Carlos Silva',
+    '1990-05-10',
+    '12345678901',
+    '11999999999',
+    'carlos@motorista.com',
+    '$2b$10$senhahash',
+    '12345678901',
+    'carlos.jpg',
+    1,
+    1
+),
+(
+    'Marcos Souza',
+    '1988-11-22',
+    '98765432100',
+    '11988888888',
+    'marcos@motorista.com',
+    '$2b$10$senhahash',
+    '98765432100',
+    'marcos.jpg',
+    2,
+    2
+);
+
+-- ==========================================
+-- PEDIDOS
+-- Status:
+-- 1 = PENDENTE
+-- 2 = PAGO
+-- 3 = EM_ANDAMENTO
+-- 4 = FINALIZADO
+-- 5 = CANCELADO
+-- ==========================================
+
+INSERT INTO pedido (
+    valor_total,
+    taxa_entrega,
+    taxa_entregador,
+    taxa_app,
+    tempo_estimado,
+    fk_status_id,
+    fk_lavanderia_id,
+    fk_usuario_id,
+    fk_motorista_id
+)
+VALUES
+(
+    80.00,
+    10.00,
+    20.00,
+    6.00,
+    '01:30:00',
+    3,
+    1,
+    1,
+    1
+),
+(
+    120.00,
+    12.00,
+    20.00,
+    6.00,
+    '02:00:00',
+    4,
+    2,
+    1,
+    2
+);
+
+-- CESTOS
+
+INSERT INTO cesto (
+    peso_estimado,
+    secagem,
+    tipo_lavagem,
+    fk_pedido_id
+)
+VALUES
+(
+    5.50,
+    'SIM',
+    'NORMAL',
+    1
+),
+(
+    8.20,
+    'NAO',
+    'PESADA',
+    2
+);
+
+INSERT INTO cesto (
+    peso_estimado,
+    secagem,
+    tipo_lavagem,
+    fk_pedido_id
+)
+VALUES
+(
+    3.00,
+    'SIM',
+    'NORMAL',
+    1
+),
+(
+    6.50,
+    'SIM',
+    'PESADA',
+    2
+);
