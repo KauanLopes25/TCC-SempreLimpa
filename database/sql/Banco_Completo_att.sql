@@ -688,15 +688,15 @@ SELECT
     p.valor_total,
     p.taxa_entrega,
     p.tempo_estimado,
-    s.descricao AS status,
+    s.progresso AS status_pedido,
     p.data
 FROM pedido p
 INNER JOIN usuario u
     ON u.usuario_id = p.fk_usuario_id
 INNER JOIN lavanderia l
     ON l.lavanderia_id = p.fk_lavanderia_id
-INNER JOIN status s
-    ON s.status_id = p.fk_status_id;
+INNER JOIN status_pedido s
+    ON s.status_pedido_id = p.fk_status_pedido_id;
 
 -- View para pagamento detalhado
 CREATE VIEW vw_pagamento_detalhado AS
