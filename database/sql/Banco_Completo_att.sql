@@ -996,6 +996,8 @@ DELIMITER ;
 
 DELIMITER $$
 
+DROP PROCEDURE IF EXISTS sp_criar_pedido_completo $$
+
 CREATE PROCEDURE sp_criar_pedido_completo (
     IN p_usuario INT,
     IN p_lavanderia INT,
@@ -1010,16 +1012,10 @@ BEGIN
 
     DECLARE v_pedido_id INT;
     DECLARE v_ordem_id INT;
-
     DECLARE v_valor_final DECIMAL(10,2);
-
     DECLARE v_cartao_existe INT DEFAULT 0;
-
-    DECLARE v_taxa_entregador DECIMAL(10,2)
-    DEFAULT 20.00;
-
-    DECLARE v_taxa_app DECIMAL(10,2)
-    DEFAULT 6.00;
+    DECLARE v_taxa_entregador DECIMAL(10,2) DEFAULT 20.00;
+    DECLARE v_taxa_app DECIMAL(10,2) DEFAULT 6.00;
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -1064,7 +1060,7 @@ BEGIN
         tipo_pagamento,
         valor,
         data_criacao,
-        status_pedido,
+        status, -- 🚀 CORRIGIDO: Era 'status_pedido'
         fk_pedido_id
     )
     VALUES (
@@ -1083,7 +1079,7 @@ BEGIN
             chave_pix,
             data_expiracao,
             qr_code,
-            status_pedido,
+            status, -- 🚀 CORRIGIDO: Era 'status_pedido'
             fk_ordem_pagamento_id
         )
         VALUES (
@@ -1097,11 +1093,8 @@ BEGIN
     ELSEIF p_tipo_pagamento = 'CARTAO' THEN
 
         IF p_cartao_id IS NULL THEN
-
             SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT =
-            'Cartão obrigatório';
-
+            SET MESSAGE_TEXT = 'Cartão obrigatório';
         END IF;
 
         SELECT COUNT(*)
@@ -1110,11 +1103,8 @@ BEGIN
         WHERE cartao_id = p_cartao_id;
 
         IF v_cartao_existe = 0 THEN
-
             SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT =
-            'Cartão não encontrado';
-
+            SET MESSAGE_TEXT = 'Cartão não encontrado';
         END IF;
 
         INSERT INTO pagamento_cartao (
