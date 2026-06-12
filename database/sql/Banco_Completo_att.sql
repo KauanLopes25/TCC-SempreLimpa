@@ -1060,7 +1060,7 @@ BEGIN
         tipo_pagamento,
         valor,
         data_criacao,
-        status, -- 🚀 CORRIGIDO: Era 'status_pedido'
+        status, 
         fk_pedido_id
     )
     VALUES (
@@ -1079,7 +1079,7 @@ BEGIN
             chave_pix,
             data_expiracao,
             qr_code,
-            status, -- 🚀 CORRIGIDO: Era 'status_pedido'
+            status, 
             fk_ordem_pagamento_id
         )
         VALUES (
