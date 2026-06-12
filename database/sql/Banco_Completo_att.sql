@@ -490,12 +490,15 @@ CREATE TABLE localizacao (
 
 -- STATUS
 
-INSERT INTO status (descricao)
-VALUES
-('PENDENTE'),
-('PAGO'),
-('EM_ANDAMENTO'),
-('FINALIZADO'),
+INSERT INTO status_pedido (progresso) VALUES
+('SOLICITADO'),
+('ATRIBUIDO'),
+('COLETANDO'),
+('EM_TRANSITO'),
+('LAVANDO'),
+('SECANDO'),
+('RETORNANDO'),
+('ENTREGUE'),
 ('CANCELADO');
 
 -- ENDEREÇOS USUÁRIOS
