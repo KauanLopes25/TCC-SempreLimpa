@@ -803,7 +803,7 @@ SELECT
 
     p.data AS data_pedido,
 
-    COUNT(c.cesto_id) AS quantidade_cestos
+    (SELECT COUNT(*) FROM cesto c WHERE c.fk_pedido_id = p.pedido_id) AS quantidade_cestos
 
 FROM pedido p
 
