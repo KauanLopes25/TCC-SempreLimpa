@@ -62,9 +62,19 @@ CREATE TABLE endereco_motorista (
     complemento VARCHAR(100)
 );
 
-CREATE TABLE status (
-    status_id INT PRIMARY KEY AUTO_INCREMENT,
-    descricao VARCHAR(50) NOT NULL
+CREATE TABLE status_pedido(
+    status_pedido_id INT PRIMARY KEY AUTO_INCREMENT,
+    progresso ENUM(
+  'SOLICITADO',
+  'ATRIBUIDO',
+  'COLETANDO',
+  'EM_TRANSITO',
+  'LAVANDO',
+  'SECANDO',
+  'RETORNANDO',
+  'ENTREGUE',
+  'CANCELADO'
+) not null default 'SOLICITADO'
 );
 
 CREATE TABLE roupas (
@@ -209,14 +219,14 @@ CREATE TABLE pedido (
 
     tempo_estimado TIME,
 
-    fk_status_id INT,
+    fk_status_pedido_id INT,
     fk_lavanderia_id INT,
     fk_usuario_id INT,
     fk_motorista_id INT,
 
     CONSTRAINT fk_pedido_status
-        FOREIGN KEY (fk_status_id)
-        REFERENCES status(status_id),
+        FOREIGN KEY (fk_status_pedido_id)
+        REFERENCES status_pedido(status_pedido_id),
 
     CONSTRAINT fk_pedido_lavanderia
         FOREIGN KEY (fk_lavanderia_id)
