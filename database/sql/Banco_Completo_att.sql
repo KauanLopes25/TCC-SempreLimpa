@@ -114,7 +114,7 @@ CREATE TABLE lavanderia (
     preco_padrao_lavagem DECIMAL(10,2) NOT NULL,
     preco_padrao_secagem DECIMAL(10,2) NOT NULL,
 
-    logo VARCHAR(255),
+    logo text,
     e_mail VARCHAR(255),
     telefone VARCHAR(11),
 
@@ -509,60 +509,6 @@ VALUES
 -- USUÁRIOS
 
 -- LAVANDERIAS
-
-INSERT INTO lavanderia (
-    nome,
-    descricao,
-    cnpj,
-    tempo_padrao_lavagem,
-    tempo_secagem,
-    preco_padrao_lavagem,
-    preco_padrao_secagem,
-    logo,
-    e_mail,
-    telefone,
-    fk_endereco_lavanderia
-)
-VALUES
-(
-    '5asec',
-    'Lavagem premium',
-    '04078995000245',
-    '01:00:00',
-    '00:30:00',
-    30.00,
-    15.00,
-    'logo1.png',
-    '5asec@test.com',
-    '11999999998',
-    1
-),
-(
-    'White Bubble',
-    'Lavagem ecológica',
-    '12345678000199',
-    '01:30:00',
-    '00:40:00',
-    25.50,
-    12.00,
-    'logo2.png',
-    'bubble@test.com',
-    '11988888888',
-    2
-),
-(
-    'Super Clean',
-    'Lavagem pesada',
-    '98765432000188',
-    '02:00:00',
-    '01:00:00',
-    40.00,
-    20.00,
-    'logo3.png',
-    'superclean@test.com',
-    '11977777777',
-    3
-);
 
 -- CARTÕES
 
@@ -1213,11 +1159,11 @@ VALUES
     '5asec',
     'Lavagem premium',
     '04078995090245',
-    '01:00:00',
-    '00:30:00',
-    30.00,
-    15.00,
-    'logo1.png',
+    '00:45:00',
+    '00:45:00',
+    18.90,
+    18.90,
+    'https://scontent.fbfh1-1.fna.fbcdn.net/v/t39.30808-6/325556027_734480314770260_4600703635217946473_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x2048&ctp=s2048x2048&_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=7T19cm6NmJsQ7kNvwEwRrxb&_nc_oc=AdqPEdFWQcXmKfi-6mCvrUtdYZXiTeAMZ4UESCBxtq87tHoEUKB6wxwk5OXe8dNF7EY&_nc_zt=23&_nc_ht=scontent.fbfh1-1.fna&_nc_gid=S8A0lLkAHu9j2dMQs8FMjA&_nc_ss=7b289&oh=00_Af8fzZL5TlglRkZ4RcFkrflr_iBv0kLAgpnJdlv7BIFvug&oe=6A3852C6',
     '5asec@test.com',
     '11999999998',
     1
@@ -1226,10 +1172,10 @@ VALUES
     'White Bubble',
     'Lavagem ecológica',
     '12345678040199',
-    '01:30:00',
-    '00:40:00',
-    25.50,
-    12.00,
+    '00:45:00',
+    '00:45:00',
+    18.90,
+    18.90,
     'logo2.png',
     'bubble@test.com',
     '11988888888',
@@ -1241,8 +1187,8 @@ VALUES
     '98765432060188',
     '02:00:00',
     '01:00:00',
-    40.00,
-    20.00,
+    18.90,
+    18.90,
     'logo3.png',
     'superclean@test.com',
     '11977777777',
@@ -1479,4 +1425,33 @@ VALUES
     'SIM',
     'PESADA',
     2
+);
+
+INSERT INTO avaliacao (
+    nota,
+    data,
+    comentario,
+    fk_usuario_id,
+    fk_lavanderia_id
+) VALUES
+(
+    5,
+    NOW(),
+    'Excelente atendimento e entrega rápida.',
+    1,
+    1
+),
+(
+    4,
+    NOW(),
+    'Serviço muito bom, roupas bem cuidadas.',
+    1,
+    2
+),
+(
+    3,
+    NOW(),
+    'Serviço satisfatório, mas houve atraso na entrega.',
+    1,
+    3
 );
